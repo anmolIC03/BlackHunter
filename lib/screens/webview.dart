@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:webview_flutter/webview_flutter.dart' show JavaScriptMode;
 
 class WebViewScreen extends StatefulWidget {
   const WebViewScreen({super.key});

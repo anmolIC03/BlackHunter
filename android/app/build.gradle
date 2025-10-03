@@ -1,7 +1,7 @@
 plugins {
     id "com.android.application"
     id "kotlin-android"
-    id "dev.flutter.flutter-gradle-plugin" // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
+    id "dev.flutter.flutter-gradle-plugin"
 }
 
 def localProperties = new Properties()
@@ -17,38 +17,46 @@ def flutterVersionName = localProperties.getProperty("flutter.versionName", "1.0
 
 android {
     namespace = "com.example.black_hunter"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 35
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    // This ensures Kotlin targets the correct Java version, preventing conflicts.
+    kotlinOptions {
+        jvmTarget = '17'
     }
 
     defaultConfig {
         applicationId = "com.example.black_hunter"
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+        minSdk = 24
+        targetSdk = 35
         versionCode = flutterVersionCode.toInteger()
         versionName = flutterVersionName
+        multiDexEnabled true // Added to support apps with a large number of methods
     }
 
     signingConfigs {
-    release {
-        def keystorePropertiesFile = rootProject.file("key.properties")
-        def keystoreProperties = new Properties()
+        release {
+            def keystorePropertiesFile = rootProject.file("key.properties")
+            def keystoreProperties = new Properties()
 
-        if (keystorePropertiesFile.exists()) {
-            keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
-            storeFile file(keystoreProperties["storeFile"])
-            storePassword keystoreProperties["storePassword"]
-            keyAlias keystoreProperties["keyAlias"]
-            keyPassword keystoreProperties["keyPassword"]
-        } else {
-            throw new FileNotFoundException("🚨 ERROR: key.properties file not found! Exiting build.")
+            if (keystorePropertiesFile.exists()) {
+                keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+                storeFile file(keystoreProperties["storeFile"])
+                storePassword keystoreProperties["storePassword"]
+                keyAlias keystoreProperties["keyAlias"]
+                keyPassword keystoreProperties["keyPassword"]
+            } else {
+                if (gradle.startParameter.taskNames.any { it.toLowerCase().contains('release') }) {
+                    throw new FileNotFoundException("🚨 ERROR: key.properties file not found! Release build failed.")
+                }
+            }
         }
     }
-}
 
     buildTypes {
         release {
@@ -62,3 +70,11 @@ android {
 flutter {
     source = "../.."
 }
+
+dependencies {
+    // Added dependency for multiDex
+    implementation "androidx.multidex:multidex:2.0.1"
+}
+
+
+
