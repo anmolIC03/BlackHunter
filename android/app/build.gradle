@@ -33,7 +33,7 @@ android {
     defaultConfig {
         applicationId = "com.example.black_hunter"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 36
         versionCode = flutterVersionCode.toInteger()
         versionName = flutterVersionName
         multiDexEnabled true // Added to support apps with a large number of methods
